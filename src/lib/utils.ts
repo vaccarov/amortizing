@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { AmortizationResult } from "@/types/amortization";
+import type { AmortizationResult } from "@/types";
 import { fmtDate } from "./format";
 
 export function cn(...inputs: ClassValue[]) {
@@ -10,8 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 export function downloadCSV(result: AmortizationResult) {
   const sep = ";";
   const lines = [
-    "\uFEFF" +
-      "Mois;Date;Capital restant;Mensualité;Capital;Intérêts;Assurance;Revenus;Cashflow;Taxes",
+    "\uFEFF" + "Month;Date;Balance;Payment;Principal;Interest;Insurance;Income;Cashflow;Taxes",
     ...result.rows.map((r) =>
       [
         r.month,
@@ -32,7 +31,7 @@ export function downloadCSV(result: AmortizationResult) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "tableau_amortissement.csv";
+  a.download = "amortization_schedule.csv";
   a.click();
   URL.revokeObjectURL(url);
 }

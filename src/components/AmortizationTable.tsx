@@ -1,48 +1,46 @@
 import { ChevronDown } from "lucide-react";
+import { useMemo } from "react";
+import { computeTotals } from "@/lib/calculation";
 import { fmt, fmtDate } from "@/lib/format";
 import type { Lang } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type { AmortizationResult } from "@/types/amortization";
-import type { Totals, YearGroup } from "@/types/table";
+import type { AmortizationResult, YearGroup } from "@/types";
 
 interface AmortizationTableProps {
   result: AmortizationResult;
   yearGroups: YearGroup[];
-  totals: Totals;
-  totalRows: number;
-  totalTaxes: number;
-  avgTaxes: number;
-  averages: {
-    payment: number;
-    principalPaid: number;
-    interest: number;
-    insurance: number;
-    income: number;
-    cashflow: number;
-  };
   expanded: Set<number>;
   onToggleYear: (year: number) => void;
   lang: Lang;
 }
 
-const cell = "text-right text-xs tabular-nums px-2 py-1.5";
+const cell = "text-right text-xs tabular-nums p-1.5";
 const hdr = "text-xs font-medium text-muted-foreground px-2 py-1.5";
 const cfColor = (v: number) => (v >= 0 ? "text-green-600 dark:text-green-400" : "text-destructive");
 
 export default function AmortizationTable({
   result,
   yearGroups,
-  totals,
-  totalRows,
-  totalTaxes,
-  avgTaxes,
-  averages,
   expanded,
   onToggleYear,
   lang,
 }: AmortizationTableProps) {
-  if (!result || !totals || !averages) return null;
+  const totals = useMemo(() => computeTotals(result.rows), [result]);
+  const totalRows = result.rows.length;
+  const totalTaxes = yearGroups.reduce((s, g) => s + g.summary.taxes, 0);
+  const averages = useMemo(
+    () => ({
+      payment: totals.payment / totalRows,
+      principalPaid: totals.principalPaid / totalRows,
+      interest: totals.interest / totalRows,
+      insurance: totals.insurance / totalRows,
+      income: totals.income / totalRows,
+      cashflow: totals.cashflow / totalRows,
+      taxes: yearGroups.length > 0 ? totalTaxes / yearGroups.length : 0,
+    }),
+    [totals, totalRows, totalTaxes, yearGroups],
+  );
 
   return (
     <div className="flex-1 overflow-auto rounded-lg border">
@@ -72,7 +70,7 @@ export default function AmortizationTable({
             <td className={cell}>{fmt(averages.insurance)}</td>
             <td className={cell}>{fmt(averages.income)}</td>
             <td className={cn(cell, cfColor(averages.cashflow))}>{fmt(averages.cashflow)}</td>
-            <td className={cell}>{fmt(avgTaxes)}</td>
+            <td className={cell}>{fmt(averages.taxes)}</td>
           </tr>
           <tr className="border-b bg-muted/80 font-bold">
             <th className={hdr}>{t("colMonth", lang)}</th>

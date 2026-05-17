@@ -25,3 +25,7 @@ export function addMonths(date: Date, n: number) {
   d.setMonth(d.getMonth() + n);
   return d;
 }
+
+export const toAnnualRate = (monthly: number) => {
+  return ((1 + monthly) ** 12 - 1) * 100;
+};

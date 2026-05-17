@@ -4,11 +4,10 @@ import Sidebar from "@/components/Sidebar";
 import type { Lang } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import { useAmortization } from "@/lib/useAmortization";
-import type { AmortizationParams } from "@/types/amortization";
-import type { Extra } from "@/types/extra";
+import type { Params } from "@/types";
 
 export default function Home() {
-  const [p, setP] = useState<AmortizationParams>({
+  const [params, setParams] = useState<Params>({
     loanAmount: 150000,
     annualRate: 4.35,
     duration: 240,
@@ -16,8 +15,6 @@ export default function Home() {
     gracePeriod: 6,
     startDate: "2026-05-25",
     grossYield: 6,
-  });
-  const [extra, setExtra] = useState<Extra>({
     guaranteeFee: 2400,
     processingFee: 1200,
     brokerFee: 1500,
@@ -27,8 +24,13 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>("fr");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
-  const { result, aprValues, yearGroups, totals, totalRows, totalTaxes, avgTaxes, averages } =
-    useAmortization(p, extra);
+  const { result, aprValues, yearGroups } = useAmortization(params);
+
+  const allExpanded = yearGroups.length > 0 && yearGroups.every((g) => expanded.has(g.year));
+
+  const toggleAll = () => {
+    setExpanded(allExpanded ? new Set() : new Set(yearGroups.map((g) => g.year)));
+  };
 
   const toggleYear = (year: number) => {
     setExpanded((prev) => {
@@ -42,31 +44,23 @@ export default function Home() {
   return (
     <div className="flex h-[100dvh] overflow-hidden">
       <Sidebar
-        p={p}
-        setP={setP}
+        params={params}
+        setParams={setParams}
         lang={lang}
         setLang={setLang}
         result={result}
-        yearGroups={yearGroups}
-        extra={extra}
-        setExtra={setExtra}
-        expanded={expanded}
-        setExpanded={setExpanded}
+        allExpanded={allExpanded}
+        onToggleAll={toggleAll}
         apr={aprValues.taeg}
         aprExInsurance={aprValues.taegHA}
         air={aprValues.taea}
       />
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden p-4">
-        {result && totals && averages ? (
+        {result && yearGroups.length > 0 ? (
           <AmortizationTable
             result={result}
             yearGroups={yearGroups}
-            totals={totals}
-            totalRows={totalRows}
-            totalTaxes={totalTaxes}
-            avgTaxes={avgTaxes}
-            averages={averages}
             expanded={expanded}
             onToggleYear={toggleYear}
             lang={lang}

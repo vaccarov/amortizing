@@ -7,7 +7,7 @@ interface FieldProps {
   label: string;
   id: string;
   value: string | number;
-  onChange: (val: number) => void;
+  onChange: (val: string | number) => void;
   type?: InputHTMLAttributes<HTMLInputElement>["type"];
   step?: string | number;
   min?: number;
@@ -41,7 +41,7 @@ export default function Field({
     setRaw(v);
 
     if (type === "date") {
-      onChange(v as unknown as number);
+      onChange(v);
       return;
     }
 

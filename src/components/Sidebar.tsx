@@ -16,37 +16,29 @@ import { fmt, fmtInt } from "@/lib/format";
 import type { Lang } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import { cn, downloadCSV } from "@/lib/utils";
-import type { AmortizationParams, AmortizationResult } from "@/types/amortization";
-import type { Extra } from "@/types/extra";
-import type { YearGroup } from "@/types/table";
+import type { AmortizationResult, Params } from "@/types";
 
 interface SidebarProps {
-  p: AmortizationParams;
-  setP: Dispatch<SetStateAction<AmortizationParams>>;
+  params: Params;
+  setParams: Dispatch<SetStateAction<Params>>;
   lang: Lang;
   setLang: (l: Lang) => void;
   result: AmortizationResult | null;
-  yearGroups: YearGroup[];
-  extra: Extra;
-  setExtra: Dispatch<SetStateAction<Extra>>;
-  expanded: Set<number>;
-  setExpanded: Dispatch<SetStateAction<Set<number>>>;
+  allExpanded: boolean;
+  onToggleAll: () => void;
   apr: number;
   aprExInsurance: number;
   air: number;
 }
 
 export default function Sidebar({
-  p,
-  setP,
+  params,
+  setParams,
   lang,
   setLang,
   result,
-  yearGroups,
-  extra,
-  setExtra,
-  expanded,
-  setExpanded,
+  allExpanded,
+  onToggleAll,
   apr,
   aprExInsurance,
   air,
@@ -65,30 +57,19 @@ export default function Sidebar({
     localStorage.setItem("theme", next ? "dark" : "light");
   };
 
-  const setField = (key: keyof AmortizationParams) => (val: number | string) =>
-    setP((prev) => ({ ...prev, [key]: val }));
-
-  const setExtraField = (key: keyof Extra) => (val: number) =>
-    setExtra((prev) => ({ ...prev, [key]: val }));
-
-  const downPayment = extra.guaranteeFee + extra.processingFee + extra.brokerFee;
-  const nbYears = Math.ceil(p.duration / 12);
-  const futureValue = p.loanAmount * (1 + extra.annualAppreciation / 100) ** nbYears;
-  const monthlyRent = (p.loanAmount * ((p.grossYield * 0.8) / 100)) / 12;
+  const downPayment = params.guaranteeFee + params.processingFee + params.brokerFee;
+  const nbYears = Math.ceil(params.duration / 12);
+  const futureValue = params.loanAmount * (1 + params.annualAppreciation / 100) ** nbYears;
+  const monthlyRent = (params.loanAmount * ((params.grossYield * 0.8) / 100)) / 12;
   const hasResult = !!result;
   const monthlyExInsurance = result?.M ?? 0;
 
-  const allExpanded = yearGroups.length > 0 && yearGroups.every((g) => expanded.has(g.year));
-
-  const toggleAll = () => {
-    setExpanded(allExpanded ? new Set() : new Set(yearGroups.map((g) => g.year)));
-  };
-
   const totalCost = hasResult
     ? (monthlyExInsurance > 0
-        ? monthlyExInsurance * p.duration -
-          p.loanAmount +
-          ((p.loanAmount * p.insuranceRate) / 100 / 12) * (p.duration + p.gracePeriod)
+        ? monthlyExInsurance * params.duration -
+          params.loanAmount +
+          ((params.loanAmount * params.insuranceRate) / 100 / 12) *
+            (params.duration + params.gracePeriod)
         : 0) + downPayment
     : 0;
 
@@ -127,17 +108,17 @@ export default function Sidebar({
               >
                 {lang === "fr" ? "🇬🇧" : "🇫🇷"}
               </Button>
+              <Button
+                variant="outline"
+                size="icon-xs"
+                onClick={toggleTheme}
+                title={t("toggleTheme", lang)}
+              >
+                <Sun className="size-3.5 dark:hidden" />
+                <Moon className="hidden size-3.5 dark:block" />
+              </Button>
               {hasResult && (
                 <>
-                  <Button
-                    variant="outline"
-                    size="icon-xs"
-                    onClick={toggleTheme}
-                    title={t("toggleTheme", lang)}
-                  >
-                    <Sun className="size-3.5 dark:hidden" />
-                    <Moon className="hidden size-3.5 dark:block" />
-                  </Button>
                   <Button
                     variant="outline"
                     size="icon-xs"
@@ -151,7 +132,7 @@ export default function Sidebar({
                   <Button
                     variant="outline"
                     size="icon-xs"
-                    onClick={toggleAll}
+                    onClick={onToggleAll}
                     title={allExpanded ? t("collapseAll", lang) : t("expandAll", lang)}
                   >
                     {allExpanded ? (
@@ -168,14 +149,14 @@ export default function Sidebar({
           <Field
             label={t("startDate", lang)}
             id="date"
-            value={p.startDate}
-            onChange={setField("startDate")}
+            value={params.startDate}
+            onChange={(v) => setParams((prev) => ({ ...prev, startDate: v as string }))}
             type="date"
           />
           <SliderField
             label={t("loan", lang)}
-            value={p.loanAmount}
-            onChange={(v) => setField("loanAmount")(v)}
+            value={params.loanAmount}
+            onChange={(v) => setParams((prev) => ({ ...prev, loanAmount: v }))}
             min={0}
             max={500000}
             step={1000}
@@ -183,52 +164,52 @@ export default function Sidebar({
             format={fmtInt}
           />
           <SliderField
-            label={t("annualRate", lang)}
-            value={p.annualRate}
-            onChange={(v) => setField("annualRate")(v)}
-            min={0}
-            max={10}
-            step={0.01}
-            suffix="%"
-          />
-          <SliderField
             label={t("duration", lang)}
-            value={p.duration}
-            onChange={(v) => setField("duration")(v)}
+            value={params.duration}
+            onChange={(v) => setParams((prev) => ({ ...prev, duration: v }))}
             min={1}
             max={300}
             step={1}
             format={fmtInt}
           />
           <SliderField
-            label={t("insurance", lang)}
-            value={p.insuranceRate}
-            onChange={(v) => setField("insuranceRate")(v)}
-            min={0}
-            max={0.4}
-            step={0.01}
-            suffix="%"
-          />
-          <SliderField
             label={t("gracePeriod", lang)}
-            value={p.gracePeriod}
-            onChange={(v) => setField("gracePeriod")(v)}
+            value={params.gracePeriod}
+            onChange={(v) => setParams((prev) => ({ ...prev, gracePeriod: v }))}
             min={0}
             max={10}
             step={1}
             format={fmtInt}
           />
           <SliderField
+            label={t("annualRate", lang)}
+            value={params.annualRate}
+            onChange={(v) => setParams((prev) => ({ ...prev, annualRate: v }))}
+            min={0}
+            max={10}
+            step={0.01}
+            suffix="%"
+          />
+          <SliderField
+            label={t("insurance", lang)}
+            value={params.insuranceRate}
+            onChange={(v) => setParams((prev) => ({ ...prev, insuranceRate: v }))}
+            min={0}
+            max={0.4}
+            step={0.01}
+            suffix="%"
+          />
+          <SliderField
             label={t("grossYield", lang)}
-            value={p.grossYield}
-            onChange={(v) => setField("grossYield")(v)}
+            value={params.grossYield}
+            onChange={(v) => setParams((prev) => ({ ...prev, grossYield: v }))}
             min={0}
             max={15}
             step={0.1}
             suffix="%"
           />
           <div className="-mt-1 text-[11px] text-muted-foreground/50">
-            {t("net", lang)} : <span>{fmt(p.grossYield * 0.8)}</span> %
+            {t("net", lang)} : <span>{fmt(params.grossYield * 0.8)}</span> %
           </div>
 
           {hasResult
@@ -237,8 +218,8 @@ export default function Sidebar({
 
           <SliderField
             label={t("taxRate", lang)}
-            value={extra.taxRate}
-            onChange={(v) => setExtraField("taxRate")(v)}
+            value={params.taxRate}
+            onChange={(v) => setParams((prev) => ({ ...prev, taxRate: v }))}
             min={0}
             max={45}
             step={0.1}
@@ -246,8 +227,8 @@ export default function Sidebar({
           />
           <SliderField
             label={t("appreciation", lang)}
-            value={extra.annualAppreciation}
-            onChange={(v) => setExtraField("annualAppreciation")(v)}
+            value={params.annualAppreciation}
+            onChange={(v) => setParams((prev) => ({ ...prev, annualAppreciation: v }))}
             min={-2}
             max={2}
             step={0.1}
@@ -263,8 +244,8 @@ export default function Sidebar({
           <Field
             label={t("guaranteeFee", lang)}
             id="caution"
-            value={extra.guaranteeFee}
-            onChange={setExtraField("guaranteeFee")}
+            value={params.guaranteeFee}
+            onChange={(v) => setParams((prev) => ({ ...prev, guaranteeFee: v as number }))}
             suffix="€"
             min={0}
             step={100}
@@ -272,8 +253,8 @@ export default function Sidebar({
           <Field
             label={t("processingFee", lang)}
             id="dossier"
-            value={extra.processingFee}
-            onChange={setExtraField("processingFee")}
+            value={params.processingFee}
+            onChange={(v) => setParams((prev) => ({ ...prev, processingFee: v as number }))}
             suffix="€"
             min={0}
             step={100}
@@ -281,8 +262,8 @@ export default function Sidebar({
           <Field
             label={t("brokerFee", lang)}
             id="courtage"
-            value={extra.brokerFee}
-            onChange={setExtraField("brokerFee")}
+            value={params.brokerFee}
+            onChange={(v) => setParams((prev) => ({ ...prev, brokerFee: v as number }))}
             suffix="€"
             min={0}
             step={100}
