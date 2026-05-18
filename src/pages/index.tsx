@@ -1,26 +1,14 @@
 import { useState } from "react";
 import AmortizationTable from "@/components/AmortizationTable";
 import Sidebar from "@/components/Sidebar";
+import { DEFAULT_PARAMS } from "@/lib/constants";
 import type { Lang } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import { useAmortization } from "@/lib/useAmortization";
 import type { Params } from "@/types";
 
 export default function Home() {
-  const [params, setParams] = useState<Params>({
-    loanAmount: 150000,
-    annualRate: 4.35,
-    duration: 240,
-    insuranceRate: 0.2,
-    gracePeriod: 6,
-    startDate: "2026-05-25",
-    grossYield: 6,
-    guaranteeFee: 2400,
-    processingFee: 1200,
-    brokerFee: 1500,
-    taxRate: 13,
-    annualAppreciation: 0.5,
-  });
+  const [params, setParams] = useState<Params>({ ...DEFAULT_PARAMS });
   const [lang, setLang] = useState<Lang>("fr");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 

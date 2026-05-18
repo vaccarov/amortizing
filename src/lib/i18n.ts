@@ -12,7 +12,7 @@ const dict: Record<string, { fr: string; en: string }> = {
   guaranteeFee: { fr: "Caution", en: "Guarantee fee" },
   processingFee: { fr: "Dossier bancaire", en: "Bank processing" },
   brokerFee: { fr: "Frais courtage", en: "Broker fee" },
-  downPayment: { fr: "Apport", en: "Down payment" },
+  downPayment: { fr: "Apport net", en: "Net down payment" },
   aprExInsurance: { fr: "TAEG HA", en: "APR HA" },
   apr: { fr: "TAEG", en: "APR" },
   air: { fr: "TAEA", en: "AIR" },
@@ -22,7 +22,13 @@ const dict: Record<string, { fr: string; en: string }> = {
   totalCost: { fr: "Coût total du crédit", en: "Total cost of credit" },
   appreciation: { fr: "Valorisation annuelle", en: "Annual appreciation" },
   futureValue: { fr: "Valeur à terme", en: "Future value" },
-  tri: { fr: "TRI", en: "IRR" },
+  apport: { fr: "Apport", en: "Down payment" },
+  tmi: { fr: "TMI", en: "Marginal tax rate" },
+  avgTaxRate: { fr: "Taux moyen d'imposition", en: "Average tax rate" },
+  cashback: { fr: "Cashback", en: "Cashback" },
+  europeanScpiPercent: { fr: "% SCPI UE", en: "% EU SCPI" },
+  blendedRate: { fr: "Taux effectif", en: "Blended rate" },
+  vestingPeriod: { fr: "Délai de jouissance (mois)", en: "Vesting period (mo.)" },
   expandAll: { fr: "Tout déplier", en: "Expand all" },
   collapseAll: { fr: "Tout replier", en: "Collapse all" },
   toggleTheme: { fr: "Changer le thème", en: "Toggle theme" },
@@ -46,6 +52,7 @@ const dict: Record<string, { fr: string; en: string }> = {
   colIncome: { fr: "Revenus", en: "Income" },
   colCashflow: { fr: "Cashflow", en: "Cashflow" },
   colTaxes: { fr: "Taxes", en: "Taxes" },
+  colTri: { fr: "TRI", en: "IRR" },
 };
 
 export function t(key: string, lang: Lang): string {

@@ -50,39 +50,46 @@ export default function AmortizationTable({
             <td colSpan={3} className="text-right text-xs text-muted-foreground whitespace-nowrap">
               {t("total", lang)} ({totalRows} {t("months", lang)})
             </td>
-            <td className={cn(cell, "font-bold")}>{fmt(totals.payment)}</td>
-            <td className={cn(cell, "font-bold")}>{fmt(totals.principalPaid)}</td>
-            <td className={cn(cell, "font-bold")}>{fmt(totals.interest)}</td>
-            <td className={cn(cell, "font-bold")}>{fmt(totals.insurance)}</td>
-            <td className={cn(cell, "font-bold")}>{fmt(totals.income)}</td>
+            <td className={cn(cell, "font-bold")}>{fmt(totals.payment)} €</td>
+            <td className={cn(cell, "font-bold")}>{fmt(totals.principalPaid)} €</td>
+            <td className={cn(cell, "font-bold")}>{fmt(totals.interest)} €</td>
+            <td className={cn(cell, "font-bold")}>{fmt(totals.insurance)} €</td>
+            <td className={cn(cell, "font-bold")}>{fmt(totals.income)} €</td>
             <td className={cn(cell, "font-bold", cfColor(totals.cashflow))}>
-              {fmt(totals.cashflow)}
+              {fmt(totals.cashflow)} €
             </td>
-            <td className={cn(cell, "font-bold")}>{fmt(totalTaxes)}</td>
+            <td className={cn(cell, "font-bold")}>{fmt(totalTaxes)} €</td>
+            {yearGroups.length > 0 && (
+              <td className={cn(cell, "font-bold")}>
+                {fmt(yearGroups[yearGroups.length - 1].summary.tri)} %
+              </td>
+            )}
           </tr>
           <tr className="border-b bg-muted/80 font-bold">
             <td colSpan={3} className="text-right text-xs text-muted-foreground whitespace-nowrap">
               {t("avgPerMonth", lang)}
             </td>
-            <td className={cell}>{fmt(averages.payment)}</td>
-            <td className={cell}>{fmt(averages.principalPaid)}</td>
-            <td className={cell}>{fmt(averages.interest)}</td>
-            <td className={cell}>{fmt(averages.insurance)}</td>
-            <td className={cell}>{fmt(averages.income)}</td>
-            <td className={cn(cell, cfColor(averages.cashflow))}>{fmt(averages.cashflow)}</td>
-            <td className={cell}>{fmt(averages.taxes)}</td>
+            <td className={cell}>{fmt(averages.payment)} €</td>
+            <td className={cell}>{fmt(averages.principalPaid)} €</td>
+            <td className={cell}>{fmt(averages.interest)} €</td>
+            <td className={cell}>{fmt(averages.insurance)} €</td>
+            <td className={cell}>{fmt(averages.income)} €</td>
+            <td className={cn(cell, cfColor(averages.cashflow))}>{fmt(averages.cashflow)} €</td>
+            <td className={cell}>{fmt(averages.taxes)} €</td>
+            <td className={cell}>—</td>
           </tr>
           <tr className="border-b bg-muted/80 font-bold">
             <th className={hdr}>{t("colMonth", lang)}</th>
             <th className={hdr}>{t("colDate", lang)}</th>
-            <th className={hdr}>{t("colBalance", lang)}</th>
-            <th className={hdr}>{t("colPayment", lang)}</th>
-            <th className={hdr}>{t("colPrincipal", lang)}</th>
-            <th className={hdr}>{t("colInterest", lang)}</th>
-            <th className={hdr}>{t("colInsurance", lang)}</th>
-            <th className={hdr}>{t("colIncome", lang)}</th>
-            <th className={hdr}>{t("colCashflow", lang)}</th>
-            <th className={hdr}>{t("colTaxes", lang)}</th>
+            <th className={hdr}>{t("colBalance", lang)} (€)</th>
+            <th className={hdr}>{t("colPayment", lang)} (€)</th>
+            <th className={hdr}>{t("colPrincipal", lang)} (€)</th>
+            <th className={hdr}>{t("colInterest", lang)} (€)</th>
+            <th className={hdr}>{t("colInsurance", lang)} (€)</th>
+            <th className={hdr}>{t("colIncome", lang)} (€)</th>
+            <th className={hdr}>{t("colCashflow", lang)} (€)</th>
+            <th className={hdr}>{t("colTaxes", lang)} (€)</th>
+            <th className={hdr}>{t("colTri", lang)} (%)</th>
           </tr>
         </thead>
 
@@ -114,6 +121,7 @@ export default function AmortizationTable({
                 {fmt(group.summary.cashflow)}
               </td>
               <td className={cn(cell, "font-bold")}>{fmt(group.summary.taxes)}</td>
+              <td className={cn(cell, "font-bold")}>{fmt(group.summary.tri)}</td>
             </tr>
 
             {expanded.has(group.year) &&
@@ -137,6 +145,7 @@ export default function AmortizationTable({
                   <td className={cell}>{fmt(row.insurance)}</td>
                   <td className={cell}>{fmt(row.income)}</td>
                   <td className={cn(cell, cfColor(row.cashflow))}>{fmt(row.cashflow)}</td>
+                  <td className={cell}>—</td>
                   <td className={cell}>—</td>
                 </tr>
               ))}

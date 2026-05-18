@@ -32,6 +32,7 @@ export interface YearSummary extends MonetaryColumns {
   balanceEnd: number;
   taxes: number;
   netCashflow: number;
+  tri: number;
 }
 
 export interface YearGroup {
@@ -46,11 +47,22 @@ export interface Params {
   duration: number;
   insuranceRate: number;
   gracePeriod: number;
+  vestingPeriod: number;
   startDate: string;
   grossYield: number;
   guaranteeFee: number;
   processingFee: number;
   brokerFee: number;
-  taxRate: number;
   annualAppreciation: number;
+  apport: number;
+  tmi: number;
+  avgTaxRate: number;
+  cashback: number;
+  europeanScpiPercent: number;
+}
+
+export interface TriParams {
+  loanAmount: number;
+  annualAppreciation: number;
+  initialInvestment: number;
 }

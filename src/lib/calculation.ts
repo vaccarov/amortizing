@@ -4,9 +4,11 @@ import type {
   Params,
   PaymentRow,
   Row,
+  TriParams,
   YearGroup,
   YearSummary,
 } from "@/types";
+import { SOCIAL_CONTRIBUTIONS } from "./constants";
 import { addMonths, parseDate, toAnnualRate } from "./format";
 
 function newton(
@@ -142,7 +144,8 @@ export function computeTRI(
   finalValue: number,
   initialInvestment: number,
 ): number {
-  if (cashflows.length === 0 || initialInvestment <= 0) return 0;
+  if (cashflows.length === 0) return 0;
+  if (initialInvestment <= 0) return 999;
 
   const cf = [...cashflows];
   cf[cf.length - 1] += finalValue;
@@ -158,13 +161,14 @@ export function compute(
 ): AmortizationResult | null {
   if (paymentRows.length === 0 || M === 0) return null;
 
-  const { loanAmount, gracePeriod, startDate, grossYield } = params;
+  const { loanAmount, gracePeriod, startDate, grossYield, vestingPeriod } = params;
   const start = parseDate(startDate);
   const monthlyIncome = (loanAmount * ((grossYield * 0.8) / 100)) / 12;
 
   const rows: Row[] = paymentRows.map((pr, i) => {
     const month = i + 1;
     const date = addMonths(start, month);
+    const income = month > vestingPeriod ? monthlyIncome : 0;
     return {
       month,
       date,
@@ -175,8 +179,8 @@ export function compute(
       principalPaid: pr.principalPaid,
       interest: pr.interest,
       insurance: pr.insurance,
-      income: monthlyIncome,
-      cashflow: monthlyIncome - pr.payment,
+      income,
+      cashflow: income - pr.payment,
       isGrace: month <= gracePeriod,
     };
   });
@@ -184,34 +188,83 @@ export function compute(
   return { rows, M };
 }
 
-export function buildYearGroups(rows: Row[], taxRate: number): YearGroup[] {
+function getTaxRates(tmi: number, avgTaxRate: number) {
+  return {
+    euTaxRate: Math.max(0, tmi - avgTaxRate),
+    frTaxRate: tmi + SOCIAL_CONTRIBUTIONS,
+  };
+}
+
+function computeTaxes(
+  income: number,
+  interest: number,
+  taxParams: Pick<Params, "europeanScpiPercent" | "tmi" | "avgTaxRate">,
+): number {
+  const netIncome = Math.max(0, income - interest);
+  const { euTaxRate, frTaxRate } = getTaxRates(taxParams.tmi, taxParams.avgTaxRate);
+  const euRatio = taxParams.europeanScpiPercent / 100;
+  const euNetIncome = netIncome * euRatio;
+  const frNetIncome = netIncome - euNetIncome;
+  return euNetIncome * (euTaxRate / 100) + frNetIncome * (frTaxRate / 100);
+}
+
+export function buildYearGroups(
+  rows: Row[],
+  taxParams: Pick<Params, "tmi" | "avgTaxRate" | "europeanScpiPercent">,
+  triParams: TriParams,
+): YearGroup[] {
   const map = new Map<number, Row[]>();
   for (const row of rows) {
     if (!map.has(row.year)) map.set(row.year, []);
     map.get(row.year)?.push(row);
   }
 
-  return Array.from(map.entries()).map(([year, yearRows]) => {
+  const yearEntries = Array.from(map.entries()).sort(([a], [b]) => a - b);
+  const cumulative: number[] = [];
+
+  return yearEntries.map(([year, yearRows]) => {
     const sum = (key: keyof Row) => yearRows.reduce((acc, r) => acc + (r[key] as number), 0);
 
+    const cashflows = yearRows.map((r) => r.cashflow);
+    cumulative.push(...cashflows);
+
+    const lastRow = yearRows[yearRows.length - 1];
+    const yearsElapsed = lastRow.month / 12;
+    const propertyValue =
+      triParams.loanAmount * (1 + triParams.annualAppreciation / 100) ** yearsElapsed;
+    const finalValue = propertyValue - lastRow.balanceEnd;
+    const tri = computeTRI(cumulative, finalValue, triParams.initialInvestment);
+
     const income = sum("income");
-    const cashflow = sum("cashflow");
-    const taxes = income * (taxRate / 100);
+    const interest = sum("interest");
+    const taxes = computeTaxes(income, interest, taxParams);
 
     const summary: YearSummary = {
-      balanceEnd: yearRows[yearRows.length - 1].balanceEnd,
+      balanceEnd: lastRow.balanceEnd,
       payment: sum("payment"),
       principalPaid: sum("principalPaid"),
-      interest: sum("interest"),
+      interest,
       insurance: sum("insurance"),
       income,
-      cashflow,
+      cashflow: sum("cashflow"),
       taxes,
-      netCashflow: cashflow - taxes,
+      netCashflow: sum("cashflow") - taxes,
+      tri,
     };
 
     return { year, rows: yearRows, summary };
   });
+}
+
+export function computeBlendedTaxRate(
+  tmi: number,
+  avgTaxRate: number,
+  europeanScpiPercent: number,
+): number {
+  const { euTaxRate, frTaxRate } = getTaxRates(tmi, avgTaxRate);
+  const euRatio = europeanScpiPercent / 100;
+  const frRatio = 1 - euRatio;
+  return euRatio * euTaxRate + frRatio * frTaxRate;
 }
 
 export function computeTotals(rows: Row[]): MonetaryColumns {

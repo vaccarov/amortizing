@@ -48,8 +48,32 @@ export function useAmortization(params: Params) {
   );
 
   const yearGroups = useMemo(
-    () => (result ? buildYearGroups(result.rows, params.taxRate) : []),
-    [result, params.taxRate],
+    () =>
+      result
+        ? buildYearGroups(
+            result.rows,
+            {
+              tmi: params.tmi,
+              avgTaxRate: params.avgTaxRate,
+              europeanScpiPercent: params.europeanScpiPercent,
+            },
+            {
+              loanAmount: params.loanAmount,
+              annualAppreciation: params.annualAppreciation,
+              initialInvestment: params.apport - params.cashback,
+            },
+          )
+        : [],
+    [
+      result,
+      params.tmi,
+      params.avgTaxRate,
+      params.europeanScpiPercent,
+      params.loanAmount,
+      params.annualAppreciation,
+      params.apport,
+      params.cashback,
+    ],
   );
 
   return { result, aprValues, yearGroups };
