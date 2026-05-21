@@ -7,9 +7,9 @@ import type {
   TriParams,
   YearGroup,
   YearSummary,
-} from "@/types";
-import { SOCIAL_CONTRIBUTIONS } from "./constants";
-import { addMonths, parseDate, toAnnualRate } from "./format";
+} from '@/types';
+import { SOCIAL_CONTRIBUTIONS } from './constants';
+import { addMonths, parseDate, toAnnualRate } from './format';
 
 function newton(
   f: (x: number) => number,
@@ -198,7 +198,7 @@ function getTaxRates(tmi: number, avgTaxRate: number) {
 function computeTaxes(
   income: number,
   interest: number,
-  taxParams: Pick<Params, "europeanScpiPercent" | "tmi" | "avgTaxRate">,
+  taxParams: Pick<Params, 'europeanScpiPercent' | 'tmi' | 'avgTaxRate'>,
 ): number {
   const netIncome = Math.max(0, income - interest);
   const { euTaxRate, frTaxRate } = getTaxRates(taxParams.tmi, taxParams.avgTaxRate);
@@ -210,7 +210,7 @@ function computeTaxes(
 
 export function buildYearGroups(
   rows: Row[],
-  taxParams: Pick<Params, "tmi" | "avgTaxRate" | "europeanScpiPercent">,
+  taxParams: Pick<Params, 'tmi' | 'avgTaxRate' | 'europeanScpiPercent'>,
   triParams: TriParams,
 ): YearGroup[] {
   const map = new Map<number, Row[]>();
@@ -235,20 +235,20 @@ export function buildYearGroups(
     const finalValue = propertyValue - lastRow.balanceEnd;
     const tri = computeTRI(cumulative, finalValue, triParams.initialInvestment);
 
-    const income = sum("income");
-    const interest = sum("interest");
+    const income = sum('income');
+    const interest = sum('interest');
     const taxes = computeTaxes(income, interest, taxParams);
 
     const summary: YearSummary = {
       balanceEnd: lastRow.balanceEnd,
-      payment: sum("payment"),
-      principalPaid: sum("principalPaid"),
+      payment: sum('payment'),
+      principalPaid: sum('principalPaid'),
       interest,
-      insurance: sum("insurance"),
+      insurance: sum('insurance'),
       income,
-      cashflow: sum("cashflow"),
+      cashflow: sum('cashflow'),
       taxes,
-      netCashflow: sum("cashflow") - taxes,
+      netCashflow: sum('cashflow') - taxes,
       tri,
     };
 
@@ -274,12 +274,12 @@ export function computeTotals(
   const sum = (key: keyof Row) => rows.reduce((acc, r) => acc + (r[key] as number), 0);
 
   return {
-    payment: sum("payment"),
-    principalPaid: sum("principalPaid"),
-    interest: sum("interest"),
-    insurance: sum("insurance"),
-    income: sum("income"),
-    cashflow: sum("cashflow"),
+    payment: sum('payment'),
+    principalPaid: sum('principalPaid'),
+    interest: sum('interest'),
+    insurance: sum('insurance'),
+    income: sum('income'),
+    cashflow: sum('cashflow'),
     taxes: yearGroups.reduce((s, g) => s + g.summary.taxes, 0),
     tri: yearGroups.length > 0 ? yearGroups[yearGroups.length - 1].summary.tri : null,
   };

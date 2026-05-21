@@ -1,14 +1,14 @@
-import type { InputHTMLAttributes } from "react";
-import { type ChangeEvent, useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import type { InputHTMLAttributes } from 'react';
+import { type ChangeEvent, useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface FieldProps {
   label: string;
   id: string;
   value: string | number;
   onChange: (val: string | number) => void;
-  type?: InputHTMLAttributes<HTMLInputElement>["type"];
+  type?: InputHTMLAttributes<HTMLInputElement>['type'];
   step?: string | number;
   min?: number;
   max?: number;
@@ -20,7 +20,7 @@ export default function Field({
   id,
   value,
   onChange,
-  type = "number",
+  type = 'number',
   step,
   min,
   max,
@@ -28,7 +28,7 @@ export default function Field({
 }: FieldProps) {
   const [raw, setRaw] = useState(String(value));
   const [error, setError] = useState(false);
-  const isNum = type === "number";
+  const isNum = type === 'number';
 
   useEffect(() => {
     if (String(value) !== raw && !error) {
@@ -40,12 +40,12 @@ export default function Field({
     const v = e.target.value;
     setRaw(v);
 
-    if (type === "date") {
+    if (type === 'date') {
       onChange(v);
       return;
     }
 
-    if (v === "") {
+    if (v === '') {
       setError(true);
       return;
     }
@@ -75,7 +75,7 @@ export default function Field({
           aria-invalid={error || undefined}
           className="h-7 text-xs [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           style={{
-            textAlign: isNum ? "right" : undefined,
+            textAlign: isNum ? 'right' : undefined,
             paddingRight: suffix ? 28 : undefined,
           }}
         />

@@ -1,6 +1,6 @@
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { fmt } from "@/lib/format";
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { fmt } from '@/lib/format';
 
 interface SliderFieldProps {
   label: string;

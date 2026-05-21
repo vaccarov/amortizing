@@ -1,15 +1,15 @@
-import { useState } from "react";
-import AmortizationTable from "@/components/AmortizationTable";
-import Sidebar from "@/components/Sidebar";
-import { DEFAULT_PARAMS } from "@/lib/constants";
-import type { Lang } from "@/lib/i18n";
-import { t } from "@/lib/i18n";
-import { useAmortization } from "@/lib/useAmortization";
-import type { Params } from "@/types";
+import { useState } from 'react';
+import AmortizationTable from '@/components/AmortizationTable';
+import Sidebar from '@/components/Sidebar';
+import { DEFAULT_PARAMS } from '@/lib/constants';
+import type { Lang } from '@/lib/i18n';
+import { t } from '@/lib/i18n';
+import { useAmortization } from '@/lib/useAmortization';
+import type { Params } from '@/types';
 
 export default function Home() {
   const [params, setParams] = useState<Params>({ ...DEFAULT_PARAMS });
-  const [lang, setLang] = useState<Lang>("fr");
+  const [lang, setLang] = useState<Lang>('fr');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const { result, aprValues, yearGroups } = useAmortization(params);
@@ -55,7 +55,7 @@ export default function Home() {
           />
         ) : (
           <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-            {t("noResult", lang)}
+            {t('noResult', lang)}
           </div>
         )}
       </main>

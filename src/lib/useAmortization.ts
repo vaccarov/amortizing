@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { buildYearGroups, calculateAPR, compute, computePaymentRows } from "@/lib/calculation";
-import type { Params } from "@/types";
+import { useMemo } from 'react';
+import { buildYearGroups, calculateAPR, compute, computePaymentRows } from '@/lib/calculation';
+import type { Params } from '@/types';
 
 export function useAmortization(params: Params) {
   const fees = params.guaranteeFee + params.processingFee + params.brokerFee;

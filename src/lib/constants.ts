@@ -1,4 +1,4 @@
-import type { Params } from "@/types";
+import type { Params } from '@/types';
 
 export const SOCIAL_CONTRIBUTIONS = 18.6;
 
@@ -11,7 +11,7 @@ export const DEFAULT_PARAMS: Params = {
   insuranceRate: 0.2,
   gracePeriod: 6,
   vestingPeriod: 5,
-  startDate: "2026-05-25",
+  startDate: '2026-05-25',
   grossYield: 6,
   guaranteeFee: 2400,
   processingFee: 1200,

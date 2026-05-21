@@ -1,16 +1,16 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-import type { AmortizationResult } from "@/types";
-import { fmtDate } from "./format";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import type { AmortizationResult } from '@/types';
+import { fmtDate } from './format';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function downloadCSV(result: AmortizationResult) {
-  const sep = ";";
+  const sep = ';';
   const lines = [
-    "\uFEFF" + "Month;Date;Balance;Payment;Principal;Interest;Insurance;Income;Cashflow;Taxes",
+    '\uFEFF' + 'Month;Date;Balance;Payment;Principal;Interest;Insurance;Income;Cashflow;Taxes',
     ...result.rows.map((r) =>
       [
         r.month,
@@ -25,13 +25,13 @@ export function downloadCSV(result: AmortizationResult) {
       ].join(sep),
     ),
   ];
-  const blob = new Blob([lines.join("\n")], {
-    type: "text/csv;charset=utf-8;",
+  const blob = new Blob([lines.join('\n')], {
+    type: 'text/csv;charset=utf-8;',
   });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
-  a.download = "amortization_schedule.csv";
+  a.download = 'amortization_schedule.csv';
   a.click();
   URL.revokeObjectURL(url);
 }
