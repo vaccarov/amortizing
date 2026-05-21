@@ -91,8 +91,7 @@ export default function Sidebar({
         className={cn(
           "h-full overflow-hidden border-r bg-card transition-[width] duration-300",
           sidebarOpen ? "w-[240px]" : "w-0",
-        )}
-      >
+        )}>
         <div className="flex h-full w-full flex-col gap-2.5 overflow-y-auto p-4">
           <div className="flex items-center justify-between">
             <h1 className="mr-auto text-sm font-bold tracking-tight">Amortizing</h1>
@@ -101,16 +100,14 @@ export default function Sidebar({
                 variant="outline"
                 size="icon-xs"
                 onClick={() => setLang(lang === "fr" ? "en" : "fr")}
-                title={lang === "fr" ? "English" : "Français"}
-              >
+                title={lang === "fr" ? "English" : "Français"}>
                 {lang === "fr" ? "🇬🇧" : "🇫🇷"}
               </Button>
               <Button
                 variant="outline"
                 size="icon-xs"
                 onClick={toggleTheme}
-                title={t("toggleTheme", lang)}
-              >
+                title={t("toggleTheme", lang)}>
                 <Sun className="size-3.5 dark:hidden" />
                 <Moon className="hidden size-3.5 dark:block" />
               </Button>
@@ -122,16 +119,14 @@ export default function Sidebar({
                     onClick={() => {
                       if (result) downloadCSV(result);
                     }}
-                    title={t("exportCSV", lang)}
-                  >
+                    title={t("exportCSV", lang)}>
                     <Download className="size-3.5" />
                   </Button>
                   <Button
                     variant="outline"
                     size="icon-xs"
                     onClick={onToggleAll}
-                    title={allExpanded ? t("collapseAll", lang) : t("expandAll", lang)}
-                  >
+                    title={allExpanded ? t("collapseAll", lang) : t("expandAll", lang)}>
                     {allExpanded ? (
                       <ChevronsDownUp className="size-3.5" />
                     ) : (
@@ -365,8 +360,7 @@ export default function Sidebar({
         onClick={() => setSidebarOpen((v) => !v)}
         className="fixed top-2 z-50 flex size-8 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-muted transition-[left] duration-300"
         style={{ left: sidebarOpen ? 250 : 10 }}
-        title={sidebarOpen ? t("collapse", lang) : t("show", lang)}
-      >
+        title={sidebarOpen ? t("collapse", lang) : t("show", lang)}>
         {sidebarOpen ? <PanelLeftClose className="size-3" /> : <PanelLeftOpen className="size-3" />}
       </button>
     </div>

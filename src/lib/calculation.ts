@@ -267,7 +267,10 @@ export function computeBlendedTaxRate(
   return euRatio * euTaxRate + frRatio * frTaxRate;
 }
 
-export function computeTotals(rows: Row[]): MonetaryColumns {
+export function computeTotals(
+  rows: Row[],
+  yearGroups: YearGroup[],
+): MonetaryColumns & { taxes: number; tri: number | null } {
   const sum = (key: keyof Row) => rows.reduce((acc, r) => acc + (r[key] as number), 0);
 
   return {
@@ -277,5 +280,7 @@ export function computeTotals(rows: Row[]): MonetaryColumns {
     insurance: sum("insurance"),
     income: sum("income"),
     cashflow: sum("cashflow"),
+    taxes: yearGroups.reduce((s, g) => s + g.summary.taxes, 0),
+    tri: yearGroups.length > 0 ? yearGroups[yearGroups.length - 1].summary.tri : null,
   };
 }

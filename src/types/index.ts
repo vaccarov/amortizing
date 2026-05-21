@@ -61,6 +61,11 @@ export interface Params {
   europeanScpiPercent: number;
 }
 
+export type CellDef = {
+  value: string;
+  className?: string;
+};
+
 export interface TriParams {
   loanAmount: number;
   annualAppreciation: number;
