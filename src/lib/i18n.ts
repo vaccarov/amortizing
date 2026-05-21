@@ -33,8 +33,6 @@ const dict: Record<string, { fr: string; en: string }> = {
   collapseAll: { fr: 'Tout replier', en: 'Collapse all' },
   toggleTheme: { fr: 'Changer le thème', en: 'Toggle theme' },
   exportCSV: { fr: 'Exporter CSV', en: 'Export CSV' },
-  graceLegend: { fr: 'Différé', en: 'Grace period' },
-  yearLegend: { fr: 'Bilan', en: 'Yearly' },
   collapse: { fr: 'Réduire', en: 'Collapse' },
   show: { fr: 'Afficher', en: 'Show' },
   total: { fr: 'TOTAL', en: 'TOTAL' },

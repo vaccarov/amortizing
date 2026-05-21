@@ -28,7 +28,15 @@ const totalColumns = [
   'cashflow',
   'taxes',
 ] as const;
-const detailColumns = ['balanceStart', ...totalColumns.filter((k) => k !== 'taxes')] as const;
+const detailColumns = [
+  'balanceStart',
+  'payment',
+  'principalPaid',
+  'interest',
+  'insurance',
+  'income',
+  'cashflow',
+] as const;
 const yearColumns = ['balanceEnd', ...totalColumns, 'tri'] as const;
 
 export default function AmortizationTable({

@@ -15,7 +15,6 @@ export const fmtDate = (d: Date) =>
   });
 
 export function parseDate(str: string) {
-  if (!str) return new Date();
   const [y, m, d] = str.split('-').map(Number);
   return new Date(y, m - 1, d);
 }

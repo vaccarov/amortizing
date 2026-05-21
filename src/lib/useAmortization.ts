@@ -31,20 +31,10 @@ export function useAmortization(params: Params) {
         loanAmount: params.loanAmount,
         annualRate: params.annualRate,
         duration: params.duration,
-        insuranceRate: params.insuranceRate,
-        gracePeriod: params.gracePeriod,
         fees,
         paymentRows,
       }),
-    [
-      paymentRows,
-      params.loanAmount,
-      params.annualRate,
-      params.duration,
-      params.insuranceRate,
-      params.gracePeriod,
-      fees,
-    ],
+    [paymentRows, params.loanAmount, params.annualRate, params.duration, fees],
   );
 
   const yearGroups = useMemo(

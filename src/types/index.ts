@@ -31,7 +31,6 @@ export interface AmortizationResult {
 export interface YearSummary extends MonetaryColumns {
   balanceEnd: number;
   taxes: number;
-  netCashflow: number;
   tri: number;
 }
 
@@ -60,11 +59,6 @@ export interface Params {
   cashback: number;
   europeanScpiPercent: number;
 }
-
-export type CellDef = {
-  value: string;
-  className?: string;
-};
 
 export interface TriParams {
   loanAmount: number;

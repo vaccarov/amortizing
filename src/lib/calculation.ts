@@ -47,22 +47,20 @@ function findMonthlyRate(payments: number[], netLoan: number): number {
     return sum;
   };
 
-  const lo = -0.001;
-  const hi = 0.1;
   const fallback = 0.005;
+  let lo = -0.001;
+  let hi = 0.1;
   const flo = f(lo);
-  let _lo = lo;
-  let _hi = hi;
   let guess = fallback;
 
-  if (flo * f(_hi) < 0) {
+  if (flo * f(hi) < 0) {
     for (let i = 0; i < 50; i++) {
-      const mid = (_lo + _hi) / 2;
-      if (_hi - _lo < 1e-10) break;
-      if (f(mid) * flo <= 0) _hi = mid;
-      else _lo = mid;
+      const mid = (lo + hi) / 2;
+      if (hi - lo < 1e-10) break;
+      if (f(mid) * flo <= 0) hi = mid;
+      else lo = mid;
     }
-    guess = (_lo + _hi) / 2;
+    guess = (lo + hi) / 2;
   }
 
   const rate = newton(f, fprime, guess);
@@ -110,14 +108,12 @@ export function calculateAPR(params: {
   loanAmount: number;
   annualRate: number;
   duration: number;
-  insuranceRate: number;
-  gracePeriod: number;
   fees: number;
   paymentRows: PaymentRow[];
 }): { taeg: number; taegHA: number; taea: number } {
   const { loanAmount, annualRate, duration, fees, paymentRows } = params;
 
-  if (paymentRows.length === 0 || annualRate / 100 / 12 <= 0 || loanAmount <= 0 || duration <= 0) {
+  if (paymentRows.length === 0 || annualRate <= 0 || loanAmount <= 0 || duration <= 0) {
     return { taeg: 0, taegHA: 0, taea: 0 };
   }
 
@@ -159,7 +155,7 @@ export function compute(
   paymentRows: PaymentRow[],
   M: number,
 ): AmortizationResult | null {
-  if (paymentRows.length === 0 || M === 0) return null;
+  if (M === 0) return null;
 
   const { loanAmount, gracePeriod, startDate, grossYield, vestingPeriod } = params;
   const start = parseDate(startDate);
@@ -208,6 +204,10 @@ function computeTaxes(
   return euNetIncome * (euTaxRate / 100) + frNetIncome * (frTaxRate / 100);
 }
 
+function sumRows(rows: Row[], key: keyof Row): number {
+  return rows.reduce((acc, r) => acc + (r[key] as number), 0);
+}
+
 export function buildYearGroups(
   rows: Row[],
   taxParams: Pick<Params, 'tmi' | 'avgTaxRate' | 'europeanScpiPercent'>,
@@ -215,16 +215,15 @@ export function buildYearGroups(
 ): YearGroup[] {
   const map = new Map<number, Row[]>();
   for (const row of rows) {
-    if (!map.has(row.year)) map.set(row.year, []);
-    map.get(row.year)?.push(row);
+    const arr = map.get(row.year);
+    if (arr) arr.push(row);
+    else map.set(row.year, [row]);
   }
 
-  const yearEntries = Array.from(map.entries()).sort(([a], [b]) => a - b);
+  const yearEntries = [...map].sort(([a], [b]) => a - b);
   const cumulative: number[] = [];
 
   return yearEntries.map(([year, yearRows]) => {
-    const sum = (key: keyof Row) => yearRows.reduce((acc, r) => acc + (r[key] as number), 0);
-
     const cashflows = yearRows.map((r) => r.cashflow);
     cumulative.push(...cashflows);
 
@@ -235,20 +234,19 @@ export function buildYearGroups(
     const finalValue = propertyValue - lastRow.balanceEnd;
     const tri = computeTRI(cumulative, finalValue, triParams.initialInvestment);
 
-    const income = sum('income');
-    const interest = sum('interest');
+    const income = sumRows(yearRows, 'income');
+    const interest = sumRows(yearRows, 'interest');
     const taxes = computeTaxes(income, interest, taxParams);
 
     const summary: YearSummary = {
       balanceEnd: lastRow.balanceEnd,
-      payment: sum('payment'),
-      principalPaid: sum('principalPaid'),
+      payment: sumRows(yearRows, 'payment'),
+      principalPaid: sumRows(yearRows, 'principalPaid'),
       interest,
-      insurance: sum('insurance'),
+      insurance: sumRows(yearRows, 'insurance'),
       income,
-      cashflow: sum('cashflow'),
+      cashflow: sumRows(yearRows, 'cashflow'),
       taxes,
-      netCashflow: sum('cashflow') - taxes,
       tri,
     };
 
@@ -271,15 +269,13 @@ export function computeTotals(
   rows: Row[],
   yearGroups: YearGroup[],
 ): MonetaryColumns & { taxes: number; tri: number | null } {
-  const sum = (key: keyof Row) => rows.reduce((acc, r) => acc + (r[key] as number), 0);
-
   return {
-    payment: sum('payment'),
-    principalPaid: sum('principalPaid'),
-    interest: sum('interest'),
-    insurance: sum('insurance'),
-    income: sum('income'),
-    cashflow: sum('cashflow'),
+    payment: sumRows(rows, 'payment'),
+    principalPaid: sumRows(rows, 'principalPaid'),
+    interest: sumRows(rows, 'interest'),
+    insurance: sumRows(rows, 'insurance'),
+    income: sumRows(rows, 'income'),
+    cashflow: sumRows(rows, 'cashflow'),
     taxes: yearGroups.reduce((s, g) => s + g.summary.taxes, 0),
     tri: yearGroups.length > 0 ? yearGroups[yearGroups.length - 1].summary.tri : null,
   };

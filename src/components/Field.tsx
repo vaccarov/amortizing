@@ -28,13 +28,11 @@ export default function Field({
 }: FieldProps) {
   const [raw, setRaw] = useState(String(value));
   const [error, setError] = useState(false);
-  const isNum = type === 'number';
 
   useEffect(() => {
-    if (String(value) !== raw && !error) {
-      setRaw(String(value));
-    }
-  }, [value, raw, error]);
+    setRaw(String(value));
+    setError(false);
+  }, [value]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -75,7 +73,7 @@ export default function Field({
           aria-invalid={error || undefined}
           className="h-7 text-xs [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           style={{
-            textAlign: isNum ? 'right' : undefined,
+            textAlign: type === 'number' ? 'right' : undefined,
             paddingRight: suffix ? 28 : undefined,
           }}
         />
