@@ -29,6 +29,7 @@ const dict: Record<string, { fr: string; en: string }> = {
   europeanScpiPercent: { fr: '% SCPI UE', en: '% EU SCPI' },
   blendedRate: { fr: 'Taux effectif', en: 'Blended rate' },
   vestingPeriod: { fr: 'Délai de jouissance (mois)', en: 'Vesting period (mo.)' },
+  subscriptionFee: { fr: 'Frais de souscription', en: 'Subscription fee' },
   expandAll: { fr: 'Tout déplier', en: 'Expand all' },
   collapseAll: { fr: 'Tout replier', en: 'Collapse all' },
   toggleTheme: { fr: 'Changer le thème', en: 'Toggle theme' },

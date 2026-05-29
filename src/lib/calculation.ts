@@ -230,7 +230,9 @@ export function buildYearGroups(
     const lastRow = yearRows[yearRows.length - 1];
     const yearsElapsed = lastRow.month / 12;
     const propertyValue =
-      triParams.loanAmount * (1 + triParams.annualAppreciation / 100) ** yearsElapsed;
+      triParams.loanAmount *
+      (1 - triParams.subscriptionFee / 100) *
+      (1 + triParams.annualAppreciation / 100) ** yearsElapsed;
     const finalValue = propertyValue - lastRow.balanceEnd;
     const tri = computeTRI(cumulative, finalValue, triParams.initialInvestment);
 

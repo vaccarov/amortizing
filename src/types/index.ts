@@ -58,10 +58,12 @@ export interface Params {
   avgTaxRate: number;
   cashback: number;
   europeanScpiPercent: number;
+  subscriptionFee: number;
 }
 
 export interface TriParams {
   loanAmount: number;
   annualAppreciation: number;
   initialInvestment: number;
+  subscriptionFee: number;
 }

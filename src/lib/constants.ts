@@ -22,4 +22,5 @@ export const DEFAULT_PARAMS: Params = {
   avgTaxRate: 17,
   cashback: 4500,
   europeanScpiPercent: 100,
+  subscriptionFee: 10,
 };

@@ -51,7 +51,9 @@ export default function Sidebar({
   const maxApport = Math.floor(0.4 * params.loanAmount);
   const downPayment = params.apport - params.cashback;
   const futureValue =
-    params.loanAmount * (1 + params.annualAppreciation / 100) ** Math.ceil(params.duration / 12);
+    params.loanAmount *
+    (1 - params.subscriptionFee / 100) *
+    (1 + params.annualAppreciation / 100) ** Math.ceil(params.duration / 12);
   const monthlyRent = (params.loanAmount * ((params.grossYield * 0.8) / 100)) / 12;
   const hasResult = !!result;
   const monthlyExInsurance = result?.M ?? 0;
@@ -218,6 +220,15 @@ export default function Sidebar({
 
           {infoRow(t('monthlyRent', lang), hasResult ? `${fmt(monthlyRent)} €` : null)}
 
+          <SliderField
+            label={t('subscriptionFee', lang)}
+            value={params.subscriptionFee}
+            onChange={setNumericParam('subscriptionFee')}
+            min={0}
+            max={20}
+            step={0.1}
+            suffix="%"
+          />
           <SliderField
             label={t('europeanScpiPercent', lang)}
             value={params.europeanScpiPercent}

@@ -51,6 +51,7 @@ export function useAmortization(params: Params) {
               loanAmount: params.loanAmount,
               annualAppreciation: params.annualAppreciation,
               initialInvestment: params.apport - params.cashback,
+              subscriptionFee: params.subscriptionFee,
             },
           )
         : [],
@@ -63,6 +64,7 @@ export function useAmortization(params: Params) {
       params.annualAppreciation,
       params.apport,
       params.cashback,
+      params.subscriptionFee,
     ],
   );
 
